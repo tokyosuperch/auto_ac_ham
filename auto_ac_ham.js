@@ -39,6 +39,7 @@ var linearr = str.split('\r\n');
 
 var accent_length = 60;
 var hammering_length = 240;
+var hiccup_length = 60;
 var division = 480;
 var time_sig = 4;
 
@@ -76,17 +77,19 @@ function off_note(linearr, off_num) {
             break;
 		}
 	};
-    if (note_length(timestr_on, timestr_off) >= hammering_length * 4) {
+    if (note_length(timestr_on, timestr_off) > hammering_length * 2) {
         res_text += event_time(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=-1396\r\n";
         res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), hammering_length) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
     } else if (note_length(timestr_on, timestr_off) >= accent_length * 4) {
         res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length) + "|Pitch Wheel | chan= 1   | bend=4096\r\n";
         res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
     }
+    if (note_length(timestr_on, timestr_off) >= division && note_length(timestr_on, timestr_off) <= division * 2) {
+        res_text += event_time_add(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2]), hiccup_length * -1) + "|Pitch Wheel | chan= 1   | bend=8191\r\n";
+        res_text += event_time(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+    }
     res_text += linearr[off_num];
     return res_text;
-    // Console.WriteLine("\t" + String.Format("{0,3}", currenttick + 60) +" |Pitch Wheel | chan= 1   | bend=4096");
-    // Console.WriteLine("\t" + String.Format("{0,3}", currenttick + 120) + " |Pitch Wheel | chan= 1   | bend=0");
 };
 
 function event_time_add(linearr, lnum, mea, beat, tick, length) {
@@ -97,9 +100,17 @@ function event_time_add(linearr, lnum, mea, beat, tick, length) {
         new_tick -= division;
         new_beat += 1;
 	}
+    if (new_tick < 0) {
+        new_tick += division;
+        new_beat -= 1;
+	}
     if (new_beat > time_sig) {
         new_beat -= 4;
         new_mea += 1;
+	}
+    if (new_beat <= 0) {
+        new_beat += 4;
+        new_mea -= 1;
 	}
     return event_time(linearr, lnum, new_mea, new_beat, new_tick);
 };
