@@ -78,7 +78,7 @@ function off_note(linearr, off_num) {
 		}
 	};
     if (note_length(timestr_on, timestr_off) > hammering_length * 2) {
-        res_text += event_time(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=-1396\r\n";
+        res_text += event_time(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=-546\r\n";
         res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), hammering_length) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
     } else if (note_length(timestr_on, timestr_off) >= accent_length * 4) {
         res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length) + "|Pitch Wheel | chan= 1   | bend=4096\r\n";
