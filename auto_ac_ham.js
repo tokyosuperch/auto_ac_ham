@@ -38,7 +38,7 @@ var str = file_open(arg, "Shift-JIS");
 var linearr = str.split('\r\n');
 
 var accent_length = 60;
-var hammering_length = 240;
+var hammering_length = 360;
 var hiccup_length = 60;
 var division = 480;
 var time_sig = 4;
@@ -77,18 +77,26 @@ function off_note(linearr, off_num) {
             break;
 		}
 	};
-    if (note_length(timestr_on, timestr_off) > hammering_length * 2) {
-        res_text += event_time(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=-546\r\n";
-        res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), hammering_length) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
-    } else if (note_length(timestr_on, timestr_off) >= accent_length * 4) {
-        res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length) + "|Pitch Wheel | chan= 1   | bend=4096\r\n";
-        res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+    if (note_length(timestr_on, timestr_off) >= accent_length * 3) {
+        if (note_length(timestr_on, timestr_off) > hammering_length * 1.5 && note_length(timestr_on, timestr_off) < division * 2.5) {
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length) + "|Pitch Wheel | chan= 1   | bend=-4096\r\n";
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2) + "| Controller | chan= 1   | contr=Mod H | value=0\r\n";
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2) + "|Pitch Wheel | chan= 1   | bend=-1092\r\n";
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2 + hammering_length) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+        } else {
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length) + "|Pitch Wheel | chan= 1   | bend=4096\r\n";
+            res_text += event_time_add(linearr, on_num, Number(timestr_on.split(":")[0]), Number(timestr_on.split(":")[1]), Number(timestr_on.split(":")[2]), accent_length * 2) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+        }
     }
-    if (note_length(timestr_on, timestr_off) >= division && note_length(timestr_on, timestr_off) <= division * 2) {
-        res_text += event_time_add(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2]), hiccup_length * -1) + "|Pitch Wheel | chan= 1   | bend=8191\r\n";
-        res_text += event_time(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+    /* if (note_length(timestr_on, timestr_off) > hammering_length * 4) {
+    res_text += event_time_add(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2]), (hammering_length + hiccup_length) * -1) + "|Pitch Wheel | chan= 1   | bend=-1092\r\n";
+    if (note_length(timestr_on, timestr_off) > division) {
+        res_text += event_time_add(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2]), hiccup_length * -1) + "|Pitch Wheel | chan= 1   | bend=4096\r\n";
     }
-    res_text += linearr[off_num];
+    res_text += event_time(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2])) + "|Pitch Wheel | chan= 1   | bend=0\r\n";
+} */
+    res_text += linearr[off_num] + "\r\n";
+    res_text += event_time(linearr, off_num, Number(timestr_off.split(":")[0]), Number(timestr_off.split(":")[1]), Number(timestr_off.split(":")[2])) + "| Controller | chan= 1   | contr=Mod H | value=127\r\n";
     return res_text;
 };
 
